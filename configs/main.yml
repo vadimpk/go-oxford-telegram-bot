@@ -1,0 +1,3 @@
+bot:
+  debug: true
+  timeout: 60
