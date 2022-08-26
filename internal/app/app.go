@@ -23,12 +23,17 @@ func Run(configPath string) {
 		log.Fatal(err)
 	}
 
-	db, err := bolt.Open("user_settings.db", 0600, nil)
+	db, err := bolt.Open("bot.db", 0600, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	settingsRepository, err := boltdb.NewSettingsRepository(db)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	statesRepository, err := boltdb.NewStatesRepository(db)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -40,7 +45,7 @@ func Run(configPath string) {
 
 	bot.Debug = cfg.Bot.Debug
 
-	telegramBot := telegram.NewBot(bot, oxfordClient, settingsRepository)
+	telegramBot := telegram.NewBot(bot, oxfordClient, settingsRepository, statesRepository)
 	if err := telegramBot.Start(cfg); err != nil {
 		log.Fatal(err)
 	}

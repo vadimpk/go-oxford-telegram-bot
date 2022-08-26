@@ -1,4 +1,4 @@
 .idea
 .bin
 .env
-user_settings.db
+bot.db

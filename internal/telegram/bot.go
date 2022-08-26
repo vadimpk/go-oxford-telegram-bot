@@ -12,10 +12,11 @@ type Bot struct {
 	bot                *tgbotapi.BotAPI
 	oxford             *oxford.Client
 	settingsRepository repository.SettingsRepository
+	statesRepository   repository.StatesRepository
 }
 
-func NewBot(bot *tgbotapi.BotAPI, oxfordClient *oxford.Client, sr repository.SettingsRepository) *Bot {
-	return &Bot{bot: bot, oxford: oxfordClient, settingsRepository: sr}
+func NewBot(bot *tgbotapi.BotAPI, oxfordClient *oxford.Client, settingsRep repository.SettingsRepository, statesRep repository.StatesRepository) *Bot {
+	return &Bot{bot: bot, oxford: oxfordClient, settingsRepository: settingsRep, statesRepository: statesRep}
 }
 
 func (b *Bot) Start(cfg *config.Config) error {
@@ -27,7 +28,6 @@ func (b *Bot) Start(cfg *config.Config) error {
 	}
 
 	b.handleUpdates(updates)
-
 	return nil
 }
 

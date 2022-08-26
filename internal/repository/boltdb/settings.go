@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	bucketName = "settings"
+	settingsBucket = "settings"
 )
 
 type SettingsRepository struct {
@@ -18,15 +18,15 @@ type SettingsRepository struct {
 
 func NewSettingsRepository(db *bolt.DB) (*SettingsRepository, error) {
 	err := db.Update(func(tx *bolt.Tx) error {
-		_, err := tx.CreateBucketIfNotExists([]byte(bucketName))
+		_, err := tx.CreateBucketIfNotExists([]byte(settingsBucket))
 		return err
 	})
 	return &SettingsRepository{db: db}, err
 }
 
-func (r *SettingsRepository) Save(chatID int64, settings service.Settings) error {
+func (r *SettingsRepository) Save(chatID int64, settings *service.Settings) error {
 	return r.db.Update(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte(bucketName))
+		b := tx.Bucket([]byte(settingsBucket))
 		bt, err := structToBytes(settings)
 		if err != nil {
 			return err
@@ -35,21 +35,21 @@ func (r *SettingsRepository) Save(chatID int64, settings service.Settings) error
 	})
 }
 
-func (r *SettingsRepository) Get(chatID int64) (error, service.Settings) {
+func (r *SettingsRepository) Get(chatID int64) (error, *service.Settings) {
 	var settings service.Settings
 
 	return r.db.View(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte(bucketName))
+		b := tx.Bucket([]byte(settingsBucket))
 		data := b.Get(intToBytes(chatID))
 		return bytesToStruct(data, &settings)
-	}), settings
+	}), &settings
 }
 
 func intToBytes(v int64) []byte {
 	return []byte(strconv.FormatInt(v, 10))
 }
 
-func structToBytes(s service.Settings) ([]byte, error) {
+func structToBytes(s *service.Settings) ([]byte, error) {
 	r := new(bytes.Buffer)
 	err := json.NewEncoder(r).Encode(s)
 	return r.Bytes(), err
