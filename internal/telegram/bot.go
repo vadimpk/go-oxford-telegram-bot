@@ -4,16 +4,18 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/vadimpk/go-oxford-dictionary-sdk"
 	"github.com/vadimpk/go-oxford-telegram-bot/internal/config"
+	"github.com/vadimpk/go-oxford-telegram-bot/internal/repository"
 	"log"
 )
 
 type Bot struct {
-	bot    *tgbotapi.BotAPI
-	oxford *oxford.Client
+	bot                *tgbotapi.BotAPI
+	oxford             *oxford.Client
+	settingsRepository repository.SettingsRepository
 }
 
-func NewBot(bot *tgbotapi.BotAPI, oxfordClient *oxford.Client) *Bot {
-	return &Bot{bot: bot, oxford: oxfordClient}
+func NewBot(bot *tgbotapi.BotAPI, oxfordClient *oxford.Client, sr repository.SettingsRepository) *Bot {
+	return &Bot{bot: bot, oxford: oxfordClient, settingsRepository: sr}
 }
 
 func (b *Bot) Start(cfg *config.Config) error {
