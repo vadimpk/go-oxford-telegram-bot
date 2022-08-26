@@ -7,14 +7,20 @@ import (
 
 type (
 	Config struct {
-		Bot BotConfig
+		Bot    BotConfig
+		Oxford OxfordClientConfig
 	}
 
 	BotConfig struct {
 		Debug   bool `mapstructure:"debug"`
 		Timeout int  `mapstructure:"timeout"`
 		Offset  int  `mapstructure:"offset"`
-		Api     string
+		APIKey  string
+	}
+
+	OxfordClientConfig struct {
+		AppID  string
+		AppKEY string
 	}
 )
 
@@ -28,7 +34,9 @@ func Init(configPath string) (*Config, error) {
 		return nil, err
 	}
 
-	parseEnv(&cfg)
+	if err := parseEnv(&cfg); err != nil {
+		return nil, err
+	}
 
 	return &cfg, nil
 }
@@ -48,7 +56,10 @@ func parseEnv(cfg *Config) error {
 		return err
 	}
 
-	cfg.Bot.Api = viper.GetString("BOT_API")
+	cfg.Bot.APIKey = viper.GetString("BOT_API")
+
+	cfg.Oxford.AppID = viper.GetString("APP_ID")
+	cfg.Oxford.AppKEY = viper.GetString("APP_KEY")
 
 	return nil
 }
