@@ -49,6 +49,7 @@ func Run(configPath string) {
 	bot.Debug = cfg.Bot.Debug
 
 	telegramBot := telegram.NewBot(bot, oxfordParser, settingsRepository, statesRepository, &cfg.Messages)
+	telegramBot.SetParseMode(cfg.Bot.ParseMode)
 	if err := telegramBot.Start(cfg); err != nil {
 		log.Fatal(err)
 	}

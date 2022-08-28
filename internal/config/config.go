@@ -13,10 +13,11 @@ type (
 	}
 
 	BotConfig struct {
-		Debug   bool `mapstructure:"debug"`
-		Timeout int  `mapstructure:"timeout"`
-		Offset  int  `mapstructure:"offset"`
-		TOKEN   string
+		Debug     bool   `mapstructure:"debug"`
+		Timeout   int    `mapstructure:"timeout"`
+		Offset    int    `mapstructure:"offset"`
+		ParseMode string `mapstructure:"parse_mode"`
+		TOKEN     string
 	}
 
 	OxfordClientConfig struct {

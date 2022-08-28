@@ -10,6 +10,7 @@ var (
 )
 
 func (b *Bot) sendMessage(msg tgbotapi.MessageConfig) {
+	msg.ParseMode = b.parseMode
 	_, err := b.bot.Send(msg)
 
 	if err != nil {

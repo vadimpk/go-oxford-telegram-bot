@@ -14,10 +14,15 @@ type Bot struct {
 	settingsRepository repository.SettingsRepository
 	statesRepository   repository.StatesRepository
 	messages           *config.Messages
+	parseMode          string
 }
 
 func NewBot(bot *tgbotapi.BotAPI, oxfordParser *oxford.Parser, settingsRep repository.SettingsRepository, statesRep repository.StatesRepository, messages *config.Messages) *Bot {
 	return &Bot{bot: bot, oxfordParser: oxfordParser, settingsRepository: settingsRep, statesRepository: statesRep, messages: messages}
+}
+
+func (b *Bot) SetParseMode(parseMode string) {
+	b.parseMode = parseMode
 }
 
 func (b *Bot) Start(cfg *config.Config) error {
