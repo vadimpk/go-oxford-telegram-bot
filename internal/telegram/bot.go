@@ -2,21 +2,21 @@ package telegram
 
 import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
-	"github.com/vadimpk/go-oxford-dictionary-sdk"
 	"github.com/vadimpk/go-oxford-telegram-bot/internal/config"
 	"github.com/vadimpk/go-oxford-telegram-bot/internal/repository"
+	"github.com/vadimpk/go-oxford-telegram-bot/internal/service"
 	"log"
 )
 
 type Bot struct {
 	bot                *tgbotapi.BotAPI
-	oxford             *oxford.Client
+	oxfordParser       *service.OxfordParser
 	settingsRepository repository.SettingsRepository
 	statesRepository   repository.StatesRepository
 }
 
-func NewBot(bot *tgbotapi.BotAPI, oxfordClient *oxford.Client, settingsRep repository.SettingsRepository, statesRep repository.StatesRepository) *Bot {
-	return &Bot{bot: bot, oxford: oxfordClient, settingsRepository: settingsRep, statesRepository: statesRep}
+func NewBot(bot *tgbotapi.BotAPI, oxfordParser *service.OxfordParser, settingsRep repository.SettingsRepository, statesRep repository.StatesRepository) *Bot {
+	return &Bot{bot: bot, oxfordParser: oxfordParser, settingsRepository: settingsRep, statesRepository: statesRep}
 }
 
 func (b *Bot) Start(cfg *config.Config) error {
