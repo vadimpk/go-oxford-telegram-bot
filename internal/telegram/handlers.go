@@ -22,8 +22,28 @@ const (
 const (
 	unknownCommandMessage = "I don't know this command"
 	startCommandMessage   = "Hello there"
-	chooseLanguageMessage = "Type new secondary language:"
+	chooseLanguageMessage = "Choose new secondary language:"
+	chooseLanguageSuccess = "New secondary language is set successfully"
 )
+
+func langKeyboard() tgbotapi.ReplyKeyboardMarkup {
+	var keyboard = tgbotapi.NewReplyKeyboard()
+	count := 0
+	row := 0
+	for lang := range service.Languages {
+		if count == 2 {
+			row++
+			count = 0
+		}
+		if count == 0 {
+			keyboard.Keyboard = append(keyboard.Keyboard, tgbotapi.NewKeyboardButtonRow())
+		}
+
+		keyboard.Keyboard[row] = append(keyboard.Keyboard[row], tgbotapi.NewKeyboardButton(lang))
+		count++
+	}
+	return keyboard
+}
 
 func (b *Bot) handleCommands(message *tgbotapi.Message) error {
 
@@ -41,7 +61,7 @@ func (b *Bot) handleCommands(message *tgbotapi.Message) error {
 	case toggleSentences:
 		return b.handleToggleSomethingCommand(message.Chat.ID, service.ToggleSentences)
 	default:
-		return b.handleUnknownCommand(message)
+		return errUnknownCommand
 	}
 }
 
@@ -49,107 +69,78 @@ func (b *Bot) handleMessage(message *tgbotapi.Message) error {
 
 	err, state := b.statesRepository.Get(message.Chat.ID)
 	if err != nil {
-		err, _ := b.initStates(message.Chat.ID)
-		if err != nil {
-			// DB problem
-			return err
+		if err, _ := b.initStates(message.Chat.ID); err != nil {
+			return errDBProblem
 		}
 	}
 
 	err, settings := b.settingsRepository.Get(message.Chat.ID)
 	if err != nil {
-		err, _ := b.initSettings(message.Chat.ID)
-		if err != nil {
-			// DB problem
-			return err
+		if err, _ := b.initSettings(message.Chat.ID); err != nil {
+			return errDBProblem
 		}
 	}
 
 	switch state {
 	case defaultState:
 		err, text := b.oxfordParser.Parse(message.Text, settings)
-		msg := tgbotapi.NewMessage(message.Chat.ID, text)
-		_, err = b.bot.Send(msg)
-		return err
-	case chooseLanguageState:
-		settings.SetSecondaryLang(message.Text)
-		err := b.settingsRepository.Save(message.Chat.ID, settings)
 		if err != nil {
-			return err
+			return errInternalError
 		}
-		return b.statesRepository.Save(message.Chat.ID, defaultState)
-	}
+		if text == "" {
+			return errInvalidWord
+		}
 
-	return err
+		msg := tgbotapi.NewMessage(message.Chat.ID, text)
+		b.sendMessage(msg)
+
+	case chooseLanguageState:
+		if err := settings.SetSecondaryLang(message.Text); err != nil {
+			return errInvalidLanguage
+		}
+		if err := b.settingsRepository.Save(message.Chat.ID, settings); err != nil {
+			return errDBProblem
+		}
+		if err := b.statesRepository.Save(message.Chat.ID, defaultState); err != nil {
+			return errDBProblem
+		}
+		msg := tgbotapi.NewMessage(message.Chat.ID, chooseLanguageSuccess)
+		msg.ReplyMarkup = tgbotapi.NewRemoveKeyboard(true)
+		b.sendMessage(msg)
+	}
+	return nil
 }
 
 func (b *Bot) handleStartCommand(message *tgbotapi.Message) error {
 
-	_, _, err := b.initUser(message.Chat.ID)
+	if _, _, err := b.initUser(message.Chat.ID); err != nil {
+		return errDBProblem
+	}
 
 	msg := tgbotapi.NewMessage(message.Chat.ID, startCommandMessage)
-	_, err = b.bot.Send(msg)
-
-	return err
+	b.sendMessage(msg)
+	return nil
 }
 
 func (b *Bot) handleSetSecondaryLangCommand(chatID int64) error {
-	err := b.statesRepository.Save(chatID, chooseLanguageState)
-	if err != nil {
-		return err
+	if err := b.statesRepository.Save(chatID, chooseLanguageState); err != nil {
+		return errDBProblem
 	}
-	msg := tgbotapi.NewMessage(chatID, chooseLanguageMessage)
-	_, err = b.bot.Send(msg)
 
-	return err
+	msg := tgbotapi.NewMessage(chatID, chooseLanguageMessage)
+	msg.ReplyMarkup = langKeyboard()
+	b.sendMessage(msg)
+	return nil
 }
 
 func (b *Bot) handleToggleSomethingCommand(chatID int64, toggle func(s *service.Settings)) error {
 	err, settings := b.settingsRepository.Get(chatID)
 	if err != nil {
-		return err
+		return errDBProblem
 	}
 	toggle(settings)
-	return b.settingsRepository.Save(chatID, settings)
-}
-
-func (b *Bot) handleUnknownCommand(message *tgbotapi.Message) error {
-	msg := tgbotapi.NewMessage(message.Chat.ID, unknownCommandMessage)
-	_, err := b.bot.Send(msg)
-	return err
-}
-
-func (b *Bot) initUser(chatID int64) (*service.Settings, string, error) {
-
-	err, settings := b.settingsRepository.Get(chatID)
-	if err != nil {
-		err, settings = b.initSettings(chatID)
-		if err != nil {
-			return nil, "", err
-		}
-	}
-
-	err, state := b.statesRepository.Get(chatID)
-	if err != nil {
-		err, state = b.initStates(chatID)
-		if err != nil {
-			return nil, "", err
-		}
-	}
-	return settings, state, nil
-}
-
-func (b *Bot) initSettings(chatID int64) (error, *service.Settings) {
-	settings := service.NewSettings()
 	if err := b.settingsRepository.Save(chatID, settings); err != nil {
-		return err, nil
+		return errDBProblem
 	}
-	return nil, settings
-}
-
-func (b *Bot) initStates(chatID int64) (error, string) {
-	if err := b.statesRepository.Save(chatID, defaultState); err != nil {
-		return err, ""
-	}
-	return nil, defaultState
+	return nil
 }

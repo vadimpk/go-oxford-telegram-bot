@@ -1,5 +1,9 @@
 package service
 
+import (
+	"errors"
+)
+
 type Settings struct {
 	SecondaryLang string
 	Translations  bool
@@ -8,13 +12,28 @@ type Settings struct {
 	Examples      bool
 }
 
+var Languages = map[string]string{
+	"Arabic":     "ar",
+	"German":     "de",
+	"Russian":    "ru",
+	"Spanish":    "es",
+	"Chinese":    "zh",
+	"Greek":      "el",
+	"Hindi":      "hi",
+	"Italian":    "it",
+	"Portuguese": "pt",
+	"Turkmen":    "tk",
+}
+
 func NewSettings() *Settings {
 	return &Settings{SecondaryLang: "en", Translations: false, Sentences: false, Synonyms: false, Examples: false}
 }
 
 func (s *Settings) SetSecondaryLang(sl string) error {
-	s.SecondaryLang = sl
-	// TODO: check if exists
+	if Languages[sl] == "" {
+		return errors.New("invalid language")
+	}
+	s.SecondaryLang = Languages[sl]
 	return nil
 }
 

@@ -1,22 +1,27 @@
-package service
+package oxford
 
 import (
 	"github.com/vadimpk/go-oxford-dictionary-sdk"
+	"github.com/vadimpk/go-oxford-telegram-bot/internal/service"
 	"strconv"
 )
 
-type OxfordParser struct {
+type Parser struct {
 	oxfordClient *oxford.Client
 }
 
-func NewOxfordParser(oxfordClient *oxford.Client) *OxfordParser {
-	return &OxfordParser{oxfordClient: oxfordClient}
+func NewOxfordParser(oxfordClient *oxford.Client) *Parser {
+	return &Parser{oxfordClient: oxfordClient}
 }
 
-func (p *OxfordParser) Parse(word string, settings *Settings) (error, string) {
+func (p *Parser) Parse(word string, settings *service.Settings) (error, string) {
 	entry, err := p.oxfordClient.Entry(word)
 	if err != nil {
 		return err, ""
+	}
+
+	if len(entry.Results) == 0 {
+		return nil, ""
 	}
 
 	var translations []string
@@ -42,7 +47,7 @@ func (p *OxfordParser) Parse(word string, settings *Settings) (error, string) {
 
 }
 
-func (p *OxfordParser) print(d oxford.OxfordResponse, settings *Settings, translations []string, sentences []string) (error, string) {
+func (p *Parser) print(d oxford.OxfordResponse, settings *service.Settings, translations []string, sentences []string) (error, string) {
 
 	var result string
 
@@ -70,9 +75,10 @@ func (p *OxfordParser) print(d oxford.OxfordResponse, settings *Settings, transl
 
 			if settings.Synonyms {
 				for id, s := range s.Synonyms {
-					if id < 6 {
-						result += s.Text + " "
+					if id < 4 {
+						break
 					}
+					result += s.Text + " "
 				}
 				result += "\n"
 			}
@@ -81,7 +87,10 @@ func (p *OxfordParser) print(d oxford.OxfordResponse, settings *Settings, transl
 
 	if len(sentences) > 0 {
 		result += "\n"
-		for _, s := range sentences {
+		for id, s := range sentences {
+			if id > 4 {
+				break
+			}
 			result += s + "\n"
 		}
 	}

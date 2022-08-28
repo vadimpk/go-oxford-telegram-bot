@@ -6,8 +6,8 @@ import (
 	"github.com/vadimpk/go-oxford-dictionary-sdk"
 	"github.com/vadimpk/go-oxford-telegram-bot/internal/config"
 	"github.com/vadimpk/go-oxford-telegram-bot/internal/repository/boltdb"
-	"github.com/vadimpk/go-oxford-telegram-bot/internal/service"
 	"github.com/vadimpk/go-oxford-telegram-bot/internal/telegram"
+	oxford2 "github.com/vadimpk/go-oxford-telegram-bot/pkg/oxford"
 	"log"
 )
 
@@ -24,7 +24,7 @@ func Run(configPath string) {
 		log.Fatal(err)
 	}
 
-	oxfordParser := service.NewOxfordParser(oxfordClient)
+	oxfordParser := oxford2.NewOxfordParser(oxfordClient)
 
 	db, err := bolt.Open("bot.db", 0600, nil)
 	if err != nil {

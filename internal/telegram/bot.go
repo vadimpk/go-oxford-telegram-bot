@@ -4,18 +4,18 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/vadimpk/go-oxford-telegram-bot/internal/config"
 	"github.com/vadimpk/go-oxford-telegram-bot/internal/repository"
-	"github.com/vadimpk/go-oxford-telegram-bot/internal/service"
+	"github.com/vadimpk/go-oxford-telegram-bot/pkg/oxford"
 	"log"
 )
 
 type Bot struct {
 	bot                *tgbotapi.BotAPI
-	oxfordParser       *service.OxfordParser
+	oxfordParser       *oxford.Parser
 	settingsRepository repository.SettingsRepository
 	statesRepository   repository.StatesRepository
 }
 
-func NewBot(bot *tgbotapi.BotAPI, oxfordParser *service.OxfordParser, settingsRep repository.SettingsRepository, statesRep repository.StatesRepository) *Bot {
+func NewBot(bot *tgbotapi.BotAPI, oxfordParser *oxford.Parser, settingsRep repository.SettingsRepository, statesRep repository.StatesRepository) *Bot {
 	return &Bot{bot: bot, oxfordParser: oxfordParser, settingsRepository: settingsRep, statesRepository: statesRep}
 }
 
@@ -37,11 +37,15 @@ func (b *Bot) handleUpdates(updates tgbotapi.UpdatesChannel) {
 			// log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
 
 			if update.Message.IsCommand() {
-				b.handleCommands(update.Message)
+				if err := b.handleCommands(update.Message); err != nil {
+					b.handleError(update.Message.Chat.ID, err)
+				}
 				continue
 			}
 
-			b.handleMessage(update.Message)
+			if err := b.handleMessage(update.Message); err != nil {
+				b.handleError(update.Message.Chat.ID, err)
+			}
 		}
 	}
 }
