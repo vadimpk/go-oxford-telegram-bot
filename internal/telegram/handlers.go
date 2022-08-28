@@ -1,12 +1,16 @@
 package telegram
 
 import (
+	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/vadimpk/go-oxford-telegram-bot/internal/service"
+	"strings"
 )
 
 const (
 	startCommand            = "start"
+	helpCommand             = "help"
+	settingsCommand         = "settings"
 	setSecondaryLangCommand = "set_secondary_language"
 	toggleTranslations      = "toggle_translations"
 	toggleSentences         = "toggle_sentences"
@@ -17,13 +21,6 @@ const (
 const (
 	defaultState        = "default"
 	chooseLanguageState = "chooseLanguage"
-)
-
-const (
-	unknownCommandMessage = "I don't know this command"
-	startCommandMessage   = "Hello there"
-	chooseLanguageMessage = "Choose new secondary language:"
-	chooseLanguageSuccess = "New secondary language is set successfully"
 )
 
 func langKeyboard() tgbotapi.ReplyKeyboardMarkup {
@@ -49,7 +46,11 @@ func (b *Bot) handleCommands(message *tgbotapi.Message) error {
 
 	switch message.Command() {
 	case startCommand:
-		return b.handleStartCommand(message)
+		return b.handleStartCommand(message.Chat.ID)
+	case helpCommand:
+		return b.handleHelpCommand(message.Chat.ID)
+	case settingsCommand:
+		return b.handleSettingsCommand(message.Chat.ID)
 	case setSecondaryLangCommand:
 		return b.handleSetSecondaryLangCommand(message.Chat.ID)
 	case toggleTranslations:
@@ -104,20 +105,42 @@ func (b *Bot) handleMessage(message *tgbotapi.Message) error {
 		if err := b.statesRepository.Save(message.Chat.ID, defaultState); err != nil {
 			return errDBProblem
 		}
-		msg := tgbotapi.NewMessage(message.Chat.ID, chooseLanguageSuccess)
+		msg := tgbotapi.NewMessage(message.Chat.ID, b.messages.ChooseLangSuccess)
 		msg.ReplyMarkup = tgbotapi.NewRemoveKeyboard(true)
 		b.sendMessage(msg)
 	}
 	return nil
 }
 
-func (b *Bot) handleStartCommand(message *tgbotapi.Message) error {
+func (b *Bot) handleStartCommand(chatID int64) error {
 
-	if _, _, err := b.initUser(message.Chat.ID); err != nil {
+	if _, _, err := b.initUser(chatID); err != nil {
 		return errDBProblem
 	}
 
-	msg := tgbotapi.NewMessage(message.Chat.ID, startCommandMessage)
+	msg := tgbotapi.NewMessage(chatID, b.messages.Start)
+	b.sendMessage(msg)
+	return nil
+}
+
+func (b *Bot) handleHelpCommand(chatID int64) error {
+	msg := tgbotapi.NewMessage(chatID, b.messages.Help)
+	b.sendMessage(msg)
+	return nil
+}
+
+func (b *Bot) handleSettingsCommand(chatID int64) error {
+
+	err, settings := b.settingsRepository.Get(chatID)
+	if err != nil {
+		return errDBProblem
+	}
+
+	text := fmt.Sprintf(b.messages.Settings, settings.SecondaryLang, settings.Translations, settings.Examples, settings.Synonyms, settings.Sentences)
+	text = strings.ReplaceAll(text, "true", "on")
+	text = strings.ReplaceAll(text, "false", "off")
+
+	msg := tgbotapi.NewMessage(chatID, text)
 	b.sendMessage(msg)
 	return nil
 }
@@ -127,20 +150,26 @@ func (b *Bot) handleSetSecondaryLangCommand(chatID int64) error {
 		return errDBProblem
 	}
 
-	msg := tgbotapi.NewMessage(chatID, chooseLanguageMessage)
+	msg := tgbotapi.NewMessage(chatID, b.messages.ChooseLang)
 	msg.ReplyMarkup = langKeyboard()
 	b.sendMessage(msg)
 	return nil
 }
 
-func (b *Bot) handleToggleSomethingCommand(chatID int64, toggle func(s *service.Settings)) error {
+func (b *Bot) handleToggleSomethingCommand(chatID int64, toggle func(s *service.Settings) bool) error {
 	err, settings := b.settingsRepository.Get(chatID)
 	if err != nil {
 		return errDBProblem
 	}
-	toggle(settings)
+	status := toggle(settings)
 	if err := b.settingsRepository.Save(chatID, settings); err != nil {
 		return errDBProblem
 	}
+	text := b.messages.SettingOn
+	if !status {
+		text = b.messages.SettingOff
+	}
+	msg := tgbotapi.NewMessage(chatID, text)
+	b.sendMessage(msg)
 	return nil
 }

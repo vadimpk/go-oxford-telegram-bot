@@ -2,3 +2,19 @@ bot:
   debug: true
   timeout: 60
   offset: 0
+  
+messages:
+  responses:
+    start: "Hello there"
+    choose_language: "Choose new secondary language:"
+    choose_language_success: "New secondary language is set successfully"
+    setting_on: "Now this setting is on"
+    setting_off: "Now this setting is off"
+    help: "Help!!!"
+    settings: "Your settings:\n\nTranslation language: %s\nTranslations: %v\nExamples: %v\nSynonyms: %v\nSentences: %v"
+  errors:
+    invalid_word: "Cannot find information about this word"
+    invalid_language: "This language is not available to choose"
+    unknown_command: "You have entered the command which I can't handle"
+    internal_error: "There seems to be an internal error, please, try using the bot later"
+    not_responding: "The bot is not responding, please try again later"

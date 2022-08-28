@@ -19,17 +19,17 @@ func (b *Bot) handleError(chatID int64, err error) {
 
 	switch err {
 	case errInvalidWord:
-		msg.Text = "Cannot find information about this word"
+		msg.Text = b.messages.InvalidWord
 	case errInvalidLanguage:
-		msg.Text = "This language is not available to choose"
+		msg.Text = b.messages.InvalidLang
 	case errUnknownCommand:
-		msg.Text = "You have entered the command which I can't handle"
+		msg.Text = b.messages.UnknownCommand
 	case errDBProblem:
-		msg.Text = "There seems to be an internal error, please, try using the bot later"
+		msg.Text = b.messages.InternalError
 	case errInternalError:
-		msg.Text = "There seems to be an internal error, please, try using the bot later"
+		msg.Text = b.messages.InternalError
 	default:
-		msg.Text = "The bot is not responding, please try again later"
+		msg.Text = b.messages.NotResponding
 	}
 
 	b.sendMessage(msg)

@@ -37,18 +37,22 @@ func (s *Settings) SetSecondaryLang(sl string) error {
 	return nil
 }
 
-func ToggleTranslations(s *Settings) {
+func ToggleTranslations(s *Settings) bool {
 	s.Translations = !s.Translations
+	return s.Translations
 }
 
-func ToggleSentences(s *Settings) {
+func ToggleSentences(s *Settings) bool {
 	s.Sentences = !s.Sentences
+	return s.Sentences
 }
 
-func ToggleSynonyms(s *Settings) {
+func ToggleSynonyms(s *Settings) bool {
 	s.Synonyms = !s.Synonyms
+	return s.Synonyms
 }
 
-func ToggleExamples(s *Settings) {
+func ToggleExamples(s *Settings) bool {
 	s.Examples = !s.Examples
+	return s.Examples
 }

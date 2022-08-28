@@ -41,14 +41,14 @@ func Run(configPath string) {
 		log.Fatal(err)
 	}
 
-	bot, err := tgbotapi.NewBotAPI(cfg.Bot.APIKey)
+	bot, err := tgbotapi.NewBotAPI(cfg.Bot.TOKEN)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	bot.Debug = cfg.Bot.Debug
 
-	telegramBot := telegram.NewBot(bot, oxfordParser, settingsRepository, statesRepository)
+	telegramBot := telegram.NewBot(bot, oxfordParser, settingsRepository, statesRepository, &cfg.Messages)
 	if err := telegramBot.Start(cfg); err != nil {
 		log.Fatal(err)
 	}
