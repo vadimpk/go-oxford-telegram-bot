@@ -10,6 +10,7 @@ type (
 	Config struct {
 		Bot      BotConfig
 		Oxford   OxfordClientConfig
+		Heroku   HerokuConfig
 		Messages Messages
 	}
 
@@ -24,6 +25,11 @@ type (
 	OxfordClientConfig struct {
 		AppID  string
 		AppKEY string
+	}
+
+	HerokuConfig struct {
+		On  bool   `mapstructure:"on"`
+		URL string `mapstructure:"url"`
 	}
 
 	Messages struct {
@@ -62,6 +68,9 @@ func Init(configPath string) (*Config, error) {
 	if err := viper.UnmarshalKey("messages", &cfg.Messages); err != nil {
 		return nil, err
 	}
+	if err := viper.UnmarshalKey("heroku", &cfg.Heroku); err != nil {
+		return nil, err
+	}
 
 	if err := parseEnv(&cfg); err != nil {
 		return nil, err
@@ -80,18 +89,20 @@ func parseConfigPath(filepath string) error {
 }
 
 func parseEnv(cfg *Config) error {
-	//viper.SetConfigFile(".env")
-	//if err := viper.ReadInConfig(); err != nil {
-	//	return err
-	//}
-	//
-	//cfg.Bot.TOKEN = viper.GetString("BOT_API_TOKEN")
-	//cfg.Oxford.AppID = viper.GetString("APP_ID")
-	//cfg.Oxford.AppKEY = viper.GetString("APP_KEY")
-	//
-	cfg.Bot.TOKEN = os.Getenv("BOT_API_TOKEN")
-	cfg.Oxford.AppID = os.Getenv("APP_ID")
-	cfg.Oxford.AppKEY = os.Getenv("APP_KEY")
+	if cfg.Heroku.On {
+		cfg.Bot.TOKEN = os.Getenv("BOT_API_TOKEN")
+		cfg.Oxford.AppID = os.Getenv("APP_ID")
+		cfg.Oxford.AppKEY = os.Getenv("APP_KEY")
+		return nil
+	}
 
+	viper.SetConfigFile(".env")
+	if err := viper.ReadInConfig(); err != nil {
+		return err
+	}
+
+	cfg.Bot.TOKEN = viper.GetString("BOT_API_TOKEN")
+	cfg.Oxford.AppID = viper.GetString("APP_ID")
+	cfg.Oxford.AppKEY = viper.GetString("APP_KEY")
 	return nil
 }

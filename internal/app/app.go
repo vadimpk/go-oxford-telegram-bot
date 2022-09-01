@@ -48,11 +48,6 @@ func Run(configPath string) {
 
 	bot.Debug = cfg.Bot.Debug
 
-	_, err = bot.SetWebhook(tgbotapi.NewWebhook("https://oxford-telegram-bot.herokuapp.com/" + bot.Token))
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	telegramBot := telegram.NewBot(bot, oxfordParser, settingsRepository, statesRepository, &cfg.Messages)
 	telegramBot.SetParseMode(cfg.Bot.ParseMode)
 	if err := telegramBot.Start(cfg); err != nil {

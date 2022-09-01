@@ -1,6 +1,7 @@
 package telegram
 
 import (
+	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/vadimpk/go-oxford-telegram-bot/internal/config"
 	"github.com/vadimpk/go-oxford-telegram-bot/internal/repository"
@@ -29,6 +30,11 @@ func (b *Bot) SetParseMode(parseMode string) {
 
 func (b *Bot) Start(cfg *config.Config) error {
 	log.Printf("Authorized on account %s", b.bot.Self.UserName)
+
+	_, err := b.bot.SetWebhook(tgbotapi.NewWebhook(fmt.Sprintf(cfg.Heroku.URL, b.bot.Token)))
+	if err != nil {
+		return err
+	}
 
 	updates := b.bot.ListenForWebhook("/")
 	go func() {

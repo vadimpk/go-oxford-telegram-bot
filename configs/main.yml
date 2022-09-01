@@ -3,7 +3,11 @@ bot:
   timeout: 60
   offset: 0
   parse_mode: markdown
-  
+
+heroku: 
+  on: false
+  url: "https://oxford-telegram-bot.herokuapp.com/%s"
+
 messages:
   responses:
     start: "Hello, this is Oxford Dictionary Bot.\nIt can help you to find information about any English word – definitions, translations, examples, synonyms etc.\n\nJust type your word and the information will be shown. You can also control what is shown to you with settings. For that use commands."
