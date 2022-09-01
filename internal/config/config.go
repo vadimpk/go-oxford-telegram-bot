@@ -91,7 +91,7 @@ func parseEnv(cfg *Config) error {
 
 	cfg.Bot.TOKEN = os.Getenv("BOT_API_TOKEN")
 	cfg.Oxford.AppID = os.Getenv("APP_ID")
-	cfg.Oxford.AppKEY = os.Getenv("APP_TOKEN")
+	cfg.Oxford.AppKEY = os.Getenv("APP_KEY")
 
 	return nil
 }

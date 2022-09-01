@@ -9,12 +9,9 @@ import (
 	"github.com/vadimpk/go-oxford-telegram-bot/internal/telegram"
 	oxford2 "github.com/vadimpk/go-oxford-telegram-bot/pkg/oxford"
 	"log"
-	"os"
 )
 
 func Run(configPath string) {
-
-	log.Println(os.Getenv("APP_ID"))
 
 	cfg, err := config.Init(configPath)
 
