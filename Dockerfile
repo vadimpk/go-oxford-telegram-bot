@@ -11,7 +11,6 @@ FROM alpine:latest
 WORKDIR /root/
 
 COPY --from=0 /github.com/vadimpk/go-oxford-telegram-bot/bin/bot .
-COPY --from=0 /github.com/vadimpk/go-oxford-telegram-bot/.env .
 COPY --from=0 /github.com/vadimpk/go-oxford-telegram-bot/configs configs/
 
 EXPOSE 80
