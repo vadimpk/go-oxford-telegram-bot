@@ -2,6 +2,7 @@ package config
 
 import (
 	"github.com/spf13/viper"
+	"os"
 	"strings"
 )
 
@@ -79,18 +80,18 @@ func parseConfigPath(filepath string) error {
 }
 
 func parseEnv(cfg *Config) error {
-	viper.SetConfigFile(".env")
-	if err := viper.ReadInConfig(); err != nil {
-		return err
-	}
-
-	cfg.Bot.TOKEN = viper.GetString("BOT_API_TOKEN")
-	cfg.Oxford.AppID = viper.GetString("APP_ID")
-	cfg.Oxford.AppKEY = viper.GetString("APP_KEY")
+	//viper.SetConfigFile(".env")
+	//if err := viper.ReadInConfig(); err != nil {
+	//	return err
+	//}
 	//
-	//cfg.Bot.TOKEN = os.Getenv("BOT_API_TOKEN")
-	//cfg.Oxford.AppID = os.Getenv("APP_ID")
-	//cfg.Oxford.AppKEY = os.Getenv("APP_KEY")
+	//cfg.Bot.TOKEN = viper.GetString("BOT_API_TOKEN")
+	//cfg.Oxford.AppID = viper.GetString("APP_ID")
+	//cfg.Oxford.AppKEY = viper.GetString("APP_KEY")
+	//
+	cfg.Bot.TOKEN = os.Getenv("BOT_API_TOKEN")
+	cfg.Oxford.AppID = os.Getenv("APP_ID")
+	cfg.Oxford.AppKEY = os.Getenv("APP_KEY")
 
 	return nil
 }
