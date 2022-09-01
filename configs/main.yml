@@ -1,17 +1,17 @@
 bot:
-  debug: true
+  debug: false
   timeout: 60
   offset: 0
   parse_mode: markdown
   
 messages:
   responses:
-    start: "Hello there"
+    start: "Hello, this is Oxford Dictionary Bot.\nIt can help you to find information about any English word – definitions, translations, examples, synonyms etc.\n\nJust type your word and the information will be shown. You can also control what is shown to you with settings. For that use commands."
     choose_language: "Choose new secondary language:"
     choose_language_success: "New secondary language is set successfully"
     setting_on: "Now this setting is on"
     setting_off: "Now this setting is off"
-    help: "Help!!!"
+    help: "To look up information about the word, just type it. You can also control what is shown to you with settings. For that use commands."
     settings: "Your settings:\n\nTranslation language: %s\nTranslations: %v\nExamples: %v\nSynonyms: %v\nSentences: %v"
   errors:
     invalid_word: "Cannot find information about this word"

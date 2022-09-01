@@ -40,7 +40,7 @@ func (b *Bot) Start(cfg *config.Config) error {
 func (b *Bot) handleUpdates(updates tgbotapi.UpdatesChannel) {
 	for update := range updates {
 		if update.Message != nil { // If we got a message
-			// log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
+			log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
 
 			if update.Message.IsCommand() {
 				if err := b.handleCommands(update.Message); err != nil {

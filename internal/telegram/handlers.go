@@ -4,7 +4,6 @@ import (
 	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/vadimpk/go-oxford-telegram-bot/internal/service"
-	"log"
 	"strings"
 )
 
@@ -82,8 +81,6 @@ func (b *Bot) handleMessage(message *tgbotapi.Message) error {
 			return errDBProblem
 		}
 	}
-
-	log.Println(settings)
 
 	switch state {
 	case defaultState:

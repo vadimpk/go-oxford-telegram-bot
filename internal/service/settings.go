@@ -26,7 +26,7 @@ var Languages = map[string]string{
 }
 
 func NewSettings() *Settings {
-	return &Settings{SecondaryLang: "en", Translations: false, Sentences: false, Synonyms: false, Examples: false}
+	return &Settings{SecondaryLang: "es", Translations: false, Sentences: true, Synonyms: true, Examples: true}
 }
 
 func (s *Settings) SetSecondaryLang(sl string) error {
