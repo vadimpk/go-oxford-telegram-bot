@@ -5,7 +5,7 @@ bot:
   parse_mode: markdown
 
 heroku: 
-  on: false
+  on: true
   url: "https://oxford-telegram-bot.herokuapp.com/%s"
 
 messages:
