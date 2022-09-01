@@ -6,6 +6,8 @@ import (
 	"github.com/vadimpk/go-oxford-telegram-bot/internal/repository"
 	"github.com/vadimpk/go-oxford-telegram-bot/pkg/oxford"
 	"log"
+	"net/http"
+	"os"
 )
 
 type Bot struct {
@@ -28,10 +30,13 @@ func (b *Bot) SetParseMode(parseMode string) {
 func (b *Bot) Start(cfg *config.Config) error {
 	log.Printf("Authorized on account %s", b.bot.Self.UserName)
 
-	updates, err := b.initUpdatesChannel(cfg)
-	if err != nil {
-		return err
-	}
+	updates := b.bot.ListenForWebhook("/")
+	go func() {
+		err := http.ListenAndServe(":"+os.Getenv("PORT"), nil)
+		if err != nil {
+			log.Println(err)
+		}
+	}()
 
 	b.handleUpdates(updates)
 	return nil

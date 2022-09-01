@@ -3,12 +3,13 @@ module github.com/vadimpk/go-oxford-telegram-bot
 go 1.18
 
 require (
+	github.com/boltdb/bolt v1.3.1
 	github.com/go-telegram-bot-api/telegram-bot-api v4.6.4+incompatible
 	github.com/spf13/viper v1.12.0
+	github.com/vadimpk/go-oxford-dictionary-sdk v0.0.0-20220826082204-174f35e87788
 )
 
 require (
-	github.com/boltdb/bolt v1.3.1 // indirect
 	github.com/fsnotify/fsnotify v1.5.4 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/magiconair/properties v1.8.6 // indirect
@@ -21,7 +22,6 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/subosito/gotenv v1.3.0 // indirect
 	github.com/technoweenie/multipartstreamer v1.0.1 // indirect
-	github.com/vadimpk/go-oxford-dictionary-sdk v0.0.0-20220826082204-174f35e87788 // indirect
 	golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a // indirect
 	golang.org/x/text v0.3.7 // indirect
 	gopkg.in/ini.v1 v1.66.4 // indirect
